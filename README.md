@@ -1,4 +1,4 @@
-[![GoDoc](https://godoc.org/github.com/omeid/go-yarn?status.svg)](https://godoc.org/github.com/omeid/go-tarfs) [![Coverage Status](https://coveralls.io/repos/omeid/go-yarn/badge.svg)](https://coveralls.io/r/omeid/go-yarn) [![Build Status](https://drone.io/github.com/omeid/go-yarn/status.png)](https://drone.io/github.com/omeid/go-yarn/latest)
+[![GoDoc](https://godoc.org/github.com/omeid/go-yarn?status.svg)](https://godoc.org/github.com/omeid/go-tarfs) [![Coverage Status](https://coveralls.io/repos/omeid/go-yarn/badge.png)](https://coveralls.io/r/omeid/go-yarn) [![Build Status](https://drone.io/github.com/omeid/go-yarn/status.png)](https://drone.io/github.com/omeid/go-yarn/latest)
 # Yarn
 Filesystem mapped key-string store. Ideal for embedding code like sql.
 
