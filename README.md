@@ -40,7 +40,7 @@ func main() {
 
 #### _Moar_ Files to ship, Smack That, you say?
 Don't worry.  
-I hate complicated stuff too and there is a reason Yarn is using a Virtual Filesystem, http.FileSystem namely, to allow embedding! 
+I hate complicated stuff too and there is a reason Yarn is using a Virtual Filesystem, http.FileSystem namely, to allow embedding!   
 You can simply use [go-resources](https://github.com/omeid/go-resources) to embed all your sql and other codes files.
 Make sure you read the _Techniques for "live" resources for development_ section for friction-free development.
 
