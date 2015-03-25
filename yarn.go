@@ -37,7 +37,7 @@ func New(fs http.FileSystem, pattern string) (*Yarn, error) {
 	yarn := &Yarn{make(map[string]string)}
 	for _, file := range files {
 		name := file.Name()
-		//the pattern is already checked in the start and filepath.Match doesn't return fileysstem errors, so ignoring the error.
+		//the pattern is already checked in the start so we ignore the error.
 		if ok, _ := filepath.Match(pattern, name); !ok {
 			continue
 		}
@@ -47,7 +47,6 @@ func New(fs http.FileSystem, pattern string) (*Yarn, error) {
 		}
 
 		content, err := ioutil.ReadAll(file)
-		//conntent, err := ioutil.Readall(file)
 		if err != nil {
 			return yarn, err
 		}
