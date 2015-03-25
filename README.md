@@ -56,6 +56,3 @@ Inspired by [smotes/purse](https://github.com/smotes/purse).
 
 ### LICENSE
   [MIT](LICENSE).
-
-### TODO
-  - Add more tests

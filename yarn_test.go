@@ -23,6 +23,10 @@ func TestYarn(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if err := sqls.Has("nope", "not this one"); err == nil {
+	  t.Fatal("Expected error. Got nothing.")
+	}
+
 	for name, testcontent := range testsqls {
 		content, ok := sqls.Get(name)
 		if !ok {
