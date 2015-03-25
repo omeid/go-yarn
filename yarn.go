@@ -60,6 +60,7 @@ type Yarn struct {
 	strings map[string]string
 }
 
+// Checks if a file for the provided list of keys exists, if not, returns an error.
 func (y *Yarn) Has(strings ...string) error {
 	var (
 		s  string
@@ -79,8 +80,10 @@ func (y *Yarn) Get(key string) (string, bool) {
 	return content, ok
 }
 
-//Returns a loaded file's contents as string, it panics if file doesn't exist.
+
 const missingYarn = "Yarn missing %s"
+
+//Returns a loaded file's contents as string, it panics if file doesn't exist.
 func (y *Yarn) Must(key string) string {
 	content, ok := y.strings[key]
 	if !ok {
