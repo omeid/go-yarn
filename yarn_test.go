@@ -52,7 +52,10 @@ func TestYarn(t *testing.T) {
 		func(name string) {
 			defer func() {
 				r := recover()
-				if r != nil && r != fmt.Sprintf(missingYarn, name) {
+				if r == nil {
+				  t.Fatal("Must didn't panic for unexpected `%s` key.", name)
+				}
+				if r != fmt.Sprintf(missingYarn, name) {
 					panic(r)
 				}
 			}()
