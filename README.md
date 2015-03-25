@@ -16,23 +16,25 @@ See the [GoDoc](https://godoc.org/github.com/omeid/go-yarn)
 
 
 ```go
-package main 
+package main
 
 import (
-    "net/http"
-    "github.com/omeid/go-yarn"
-    )
+	"log"
+	"net/http"
+
+	"github.com/omeid/go-yarn"
+)
 
 var sqls = yarn.Must(http.Dir("./sqls"), "*.sql")
 
 func main() {
-  err := sqls.Has("users_table.sql", "query_all.sql", "query_user.sql")
-  if err != nil {
-    log.Fatal(err)
-  }
+	err := sqls.Has("users_table.sql", "query_all.sql", "query_user.sql")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  res, err := sql.Exec(sqls.Must("users_table.sql"), params...)
-  //Just deal with it.
+	res, err := sql.Exec(sqls.Must("users_table.sql"), params...)
+	//Just deal with it.
 }
 ```
 
