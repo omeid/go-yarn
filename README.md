@@ -5,7 +5,7 @@ Filesystem mapped key-string store. Ideal for embedding code like sql.
 ### Why?
 Because programming in string literals sucks.
 
-Lack of syntax highlighting, auto-completion, and other helpful tools when write SQL or other programming languages make the task tedious and error prone, Yarn is here to help you pull your SQL strings into `*.sql` files and other code in appropriate files so you can use the write tools when coding.
+Lack of syntax highlighting, auto-completion, and other helpful tools when writing SQL or other programming languages make the task tedious and error prone, Yarn is here to help you pull your SQL strings into `*.sql` files and other code in appropriate files so you can use the right tools when coding.
 
 
 ### Documentation
