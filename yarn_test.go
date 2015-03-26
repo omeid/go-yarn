@@ -6,16 +6,11 @@ import (
 	"testing"
 )
 
-var (
-	strip    = "testdata"
-	testsqls = map[string]string{
+func TestYarn(t *testing.T) {
+	testsqls := map[string]string{
 		"insert.sql":    "INSERT INTO users (id, name, email)\nVALUES ($1, $2, $3)\n",
 		"query_all.sql": "SELECT\nid,\nname,\nFROM users\n",
 	}
-)
-
-func TestYarn(t *testing.T) {
-
 	sqls := Must(http.Dir("testdata"), "*.sql")
 
 	err := sqls.Has("insert.sql", "query_all.sql")
@@ -24,7 +19,7 @@ func TestYarn(t *testing.T) {
 	}
 
 	if err := sqls.Has("nope", "not this one"); err == nil {
-	  t.Fatal("Expected error. Got nothing.")
+		t.Fatal("Expected error. Got nothing.")
 	}
 
 	for name, testcontent := range testsqls {
@@ -57,7 +52,7 @@ func TestYarn(t *testing.T) {
 			defer func() {
 				r := recover()
 				if r == nil {
-				  t.Fatal("Must didn't panic for unexpected `%s` key.", name)
+					t.Fatal("Must didn't panic for unexpected `%s` key.", name)
 				}
 				if r != fmt.Sprintf(missingYarn, name) {
 					panic(r)
@@ -67,5 +62,4 @@ func TestYarn(t *testing.T) {
 
 		}(name)
 	}
-
 }
