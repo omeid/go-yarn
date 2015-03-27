@@ -65,12 +65,19 @@ func (y *Yarn) Has(strings ...string) error {
 	var (
 		s  string
 		ok bool
+		missing []string
 	)
+
 	for _, s = range strings {
 		if _, ok = y.strings[s]; !ok {
-			return fmt.Errorf(" Missing %s.", s)
+		  missing = append(missing, s)
 		}
 	}
+
+	if len(missing) > 0 {
+	  return fmt.Errorf(" Missing %s", missing)
+	}
+
 	return nil
 }
 
