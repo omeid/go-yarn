@@ -60,25 +60,34 @@ type Yarn struct {
 	strings map[string]string
 }
 
+
+const missingYarn = "Missing %s"
 // Checks if a file for the provided list of keys exists, if not, returns an error.
 func (y *Yarn) Has(strings ...string) error {
 	var (
-		s  string
-		ok bool
+		s       string
+		ok      bool
 		missing []string
 	)
 
 	for _, s = range strings {
 		if _, ok = y.strings[s]; !ok {
-		  missing = append(missing, s)
+			missing = append(missing, s)
 		}
 	}
 
 	if len(missing) > 0 {
-	  return fmt.Errorf(" Missing %s", missing)
+		return fmt.Errorf(missingYarn, missing)
 	}
-
 	return nil
+}
+
+// Like Has but panics on missing keys.
+func (y *Yarn) MustHave(strings ...string) {
+	err := y.Has(strings...)
+	if err != nil {
+		panic(err.Error())
+	}
 }
 
 //Returns a loaded file's contents as string and if it exists by filename.
@@ -86,9 +95,6 @@ func (y *Yarn) Get(key string) (string, bool) {
 	content, ok := y.strings[key]
 	return content, ok
 }
-
-
-const missingYarn = "Yarn missing %s"
 
 //Returns a loaded file's contents as string, it panics if file doesn't exist.
 func (y *Yarn) Must(key string) string {

@@ -28,10 +28,15 @@ import (
 var sqls = yarn.Must(http.Dir("./sqls"), "*.sql")
 
 func main() {
-	err := sqls.Has("users_table.sql", "query_all.sql", "query_user.sql")
+	sqls.MustHave("users_table.sql", "query_all.sql", "query_user.sql") //Panics otherwise.
+
+    //Or the following if you're into that sort of stuff.
+    /*
+  	err := sqls.Has("users_table.sql", "query_all.sql", "query_user.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
+    */
 
 	res, err := sql.Exec(sqls.Must("users_table.sql"), params...)
 	//Just deal with it.
