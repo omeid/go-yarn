@@ -1,4 +1,4 @@
-// Filesystem mapped key-string store. Ideal for embedding code like sql.
+// Package yarn is a filesystem mapped key-string store. Ideal for embedding code like sql.
 package yarn
 
 import (
@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 )
 
-//Like New, but panics on error.
-func Must(fs http.FileSystem, pattern string) *Yarn {
+// Must is like New, but panics on error.
+func Must(fs http.FileSystem, pattern string) Yarn {
 	y, e := New(fs, pattern)
 	if e != nil {
 		panic(e)
@@ -17,8 +17,20 @@ func Must(fs http.FileSystem, pattern string) *Yarn {
 	return y
 }
 
-//Creates a new Yarn from provided filesystem's files that match the pattern,
-func New(fs http.FileSystem, pattern string) (*Yarn, error) {
+// Yarn is script store.
+type Yarn interface {
+	// Has checks if a file for the provided list of keys exists, if not, returns an error.
+	Has(strings ...string) error
+	// MustHave is like Has but panics on missing keys.
+	MustHave(strings ...string)
+	// Get returns a loaded file's contents as string and if it exists by filename.
+	Get(key string) (string, bool)
+	// Must returns a loaded file's contents as string, it panics if file doesn't exist.
+	Must(key string) string
+}
+
+// New creates a new Yarn from provided filesystem's files that match the pattern,
+func New(fs http.FileSystem, pattern string) (Yarn, error) {
 
 	//Check the pattern.
 	_, err := filepath.Match(pattern, "")
@@ -34,11 +46,15 @@ func New(fs http.FileSystem, pattern string) (*Yarn, error) {
 		return nil, err
 	}
 
-	yarn := &Yarn{make(map[string]string)}
+	yarn := &yarn{make(map[string]string)}
 	for _, file := range files {
 		name := file.Name()
 		//the pattern is already checked in the start so we ignore the error.
-		if ok, _ := filepath.Match(pattern, name); !ok {
+		ok, err := filepath.Match(pattern, name)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
 			continue
 		}
 		file, err := fs.Open(name)
@@ -56,14 +72,14 @@ func New(fs http.FileSystem, pattern string) (*Yarn, error) {
 	return yarn, nil
 }
 
-type Yarn struct {
+type yarn struct {
 	strings map[string]string
 }
 
-
 const missingYarn = "Missing %s"
-// Checks if a file for the provided list of keys exists, if not, returns an error.
-func (y *Yarn) Has(strings ...string) error {
+
+// Has checks if a file for the provided list of keys exists, if not, returns an error.
+func (y *yarn) Has(strings ...string) error {
 	var (
 		s       string
 		ok      bool
@@ -82,22 +98,22 @@ func (y *Yarn) Has(strings ...string) error {
 	return nil
 }
 
-// Like Has but panics on missing keys.
-func (y *Yarn) MustHave(strings ...string) {
+// MustHave is like Has but panics on missing keys.
+func (y *yarn) MustHave(strings ...string) {
 	err := y.Has(strings...)
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-//Returns a loaded file's contents as string and if it exists by filename.
-func (y *Yarn) Get(key string) (string, bool) {
+// Get returns a loaded file's contents as string and if it exists by filename.
+func (y *yarn) Get(key string) (string, bool) {
 	content, ok := y.strings[key]
 	return content, ok
 }
 
-//Returns a loaded file's contents as string, it panics if file doesn't exist.
-func (y *Yarn) Must(key string) string {
+// Must returns a loaded file's contents as string, it panics if file doesn't exist.
+func (y *yarn) Must(key string) string {
 	content, ok := y.strings[key]
 	if !ok {
 		panic(fmt.Sprintf(missingYarn, key))

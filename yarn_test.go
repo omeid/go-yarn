@@ -11,7 +11,7 @@ var (
 	testyarns map[string]string
 	goodkeys  []string
 	badkeys   []string
-	sqls      *Yarn
+	sqls      Yarn
 )
 
 func TestMain(m *testing.M) {
@@ -32,7 +32,7 @@ func TestMustHave(t *testing.T) {
 	defer func() {
 		r := recover()
 		if r == nil {
-		  t.Fatal("Didn't panic for bad keys: %s", badkeys)
+			t.Fatalf("Didn't panic for bad keys: %s", badkeys)
 		}
 		if r == fmt.Sprintf(missingYarn, badkeys) {
 			return
@@ -58,22 +58,22 @@ func TestHas(t *testing.T) {
 
 func TestMust(t *testing.T) {
 	for name, testcontent := range testyarns {
-	  func(name, testcontent string) {
-		defer func() {
-			r := recover()
-			if r != nil {
-				if r == fmt.Sprintf(missingYarn, name) {
-					t.Fatalf("Missing using MUST %s", name)
-					return
+		func(name, testcontent string) {
+			defer func() {
+				r := recover()
+				if r != nil {
+					if r == fmt.Sprintf(missingYarn, name) {
+						t.Fatalf("Missing using MUST %s", name)
+						return
+					}
+					panic(r)
 				}
-				panic(r)
+			}()
+			content := sqls.Must(name)
+			if content != testcontent {
+				t.Fatalf("For %s:\nExpected:`%s`\nGot:`%s`\n", name, testcontent, content)
 			}
-		}()
-		content := sqls.Must(name)
-		if content != testcontent {
-			t.Fatalf("For %s:\nExpected:`%s`\nGot:`%s`\n", name, testcontent, content)
-		}
-	  }(name, testcontent)
+		}(name, testcontent)
 	}
 
 	for _, name := range badkeys {
@@ -81,7 +81,7 @@ func TestMust(t *testing.T) {
 			defer func() {
 				r := recover()
 				if r == nil {
-					t.Fatal("Must didn't panic for unexpected `%s` key.", name)
+					t.Fatalf("Must didn't panic for unexpected `%s` key.", name)
 				}
 				if r != fmt.Sprintf(missingYarn, name) {
 					panic(r)
@@ -106,7 +106,7 @@ func TestGet(t *testing.T) {
 
 	for _, name := range badkeys {
 		if _, ok := sqls.Get(name); ok {
-			t.Fatal("Got OK for unexpected `%s` key.", name)
+			t.Fatalf("Got OK for unexpected `%s` key.", name)
 		}
 	}
 }
