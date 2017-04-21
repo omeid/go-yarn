@@ -2,14 +2,16 @@
 package yarn
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
 // Must is like New, but panics on error.
-func Must(fs http.FileSystem, pattern string) Yarn {
-	y, e := New(fs, pattern)
+func Must(fs http.FileSystem, patterns ...string) Yarn {
+	y, e := New(fs, patterns...)
 	if e != nil {
 		panic(e)
 	}
@@ -31,44 +33,99 @@ type Yarn interface {
 }
 
 // New creates a new Yarn from provided filesystem's files that match the pattern,
-func New(fs http.FileSystem, pattern string) (Yarn, error) {
+func New(fs http.FileSystem, patterns ...string) (Yarn, error) {
 
 	//Check the pattern.
-	_, err := filepath.Match(pattern, "")
-	if err != nil {
-		return nil, err
+	for _, pattern := range patterns {
+		_, err := filepath.Match(pattern, "")
+		if err != nil {
+			return nil, err
+		}
 	}
 	dir, err := fs.Open("/")
 	if err != nil {
 		return nil, err
 	}
+
 	files, err := dir.Readdir(-1)
 	if err != nil {
 		return nil, err
 	}
 
-	yarn := newYarn()
-	for _, file := range files {
-		name := file.Name()
+	y := newYarn()
 
-		ok, err := filepath.Match(pattern, name)
-		if err != nil {
-			return nil, err
+	err = addFiles("", y, fs, files, patterns)
+	if err != nil {
+		return nil, err
+	}
+
+	return y, nil
+}
+
+func addFiles(prefix string, y *yarn, fs http.FileSystem, files []os.FileInfo, patterns []string) error {
+
+	for _, file := range files {
+
+		if file.IsDir() {
+			path := file.Name()
+
+			if prefix != "" {
+				path = filepath.Join(prefix, path)
+			}
+
+			dir, err := fs.Open(path)
+			if err != nil {
+				return nil
+			}
+
+			files, err := dir.Readdir(-1)
+			if err != nil {
+				return err
+			}
+
+			err = addFiles(path, y, fs, files, patterns)
+			if err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		path := file.Name()
+		if prefix != "" {
+			path = filepath.Join(prefix, path)
+		}
+
+		var (
+			err error
+			ok  bool
+		)
+
+		for _, pattern := range patterns {
+			ok, err = filepath.Match(pattern, path)
+			if err != nil {
+				return err
+			}
+			if ok {
+				fmt.Printf("path %v pattern %v\n", path, pattern)
+				break
+			}
 		}
 		if !ok {
 			continue
 		}
-		file, err := fs.Open(name)
+		file, err := fs.Open(path)
 		if err != nil {
-			return yarn, err
+			return err
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			return yarn, err
+			return err
 		}
-		yarn.add(name, string(content))
+
+		y.add(path, string(content))
 
 	}
-	return yarn, nil
+	return nil
 }

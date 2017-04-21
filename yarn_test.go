@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -11,19 +12,21 @@ var (
 	testyarns map[string]string
 	goodkeys  []string
 	badkeys   []string
-	sqls      Yarn
+	testdata  Yarn
 )
 
 func TestMain(m *testing.M) {
 	testyarns = map[string]string{
 		"insert.sql":    "INSERT INTO users (id, name, email)\nVALUES ($1, $2, $3)\n",
 		"query_all.sql": "SELECT\nid,\nname,\nFROM users\n",
+		"web/pages.js":  "'strict'\n\n;(function () {\n}())\n",
+		"web/test.css":  "#app {\n}\n",
 	}
 
 	goodkeys = []string{"insert.sql", "query_all.sql"}
 
 	badkeys = []string{"something.json", "random", "sql", "insert", "nope", "none"}
-	sqls = Must(http.Dir("testdata"), "*.sql")
+	testdata = Must(http.Dir("testdata"), "*.sql", "web/*")
 
 	os.Exit(m.Run())
 }
@@ -39,19 +42,19 @@ func TestMustHave(t *testing.T) {
 		}
 		panic(r)
 	}()
-	sqls.MustHave(badkeys...)
+	testdata.MustHave(badkeys...)
 	//TODO: Handle this properly.
-	sqls.MustHave(goodkeys...)
+	testdata.MustHave(goodkeys...)
 }
 
 func TestHas(t *testing.T) {
 
-	err := sqls.Has(goodkeys...)
+	err := testdata.Has(goodkeys...)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := sqls.Has(badkeys...); err == nil {
+	if err := testdata.Has(badkeys...); err == nil {
 		t.Fatal("Expected error. Got nothing.")
 	}
 }
@@ -69,9 +72,9 @@ func TestMust(t *testing.T) {
 					panic(r)
 				}
 			}()
-			content := sqls.Must(name)
+			content := testdata.Must(name)
 			if content != testcontent {
-				t.Fatalf("For %s:\nExpected:`%s`\nGot:`%s`\n", name, testcontent, content)
+				t.Fatalf("For %s:\nExpected:\n`%s`\nGot:\n`%s`\n", name, testcontent, content)
 			}
 		}(name, testcontent)
 	}
@@ -87,7 +90,7 @@ func TestMust(t *testing.T) {
 					panic(r)
 				}
 			}()
-			sqls.Must(name)
+			testdata.Must(name)
 
 		}(name)
 	}
@@ -95,18 +98,38 @@ func TestMust(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	for name, testcontent := range testyarns {
-		content, ok := sqls.Get(name)
+		content, ok := testdata.Get(name)
 		if !ok {
 			t.Fatalf("Missing %s", name)
 		}
 		if content != testcontent {
-			t.Fatalf("For %s:\nExpected:`%s`\nGot:`%s`\n", name, testcontent, content)
+			t.Fatalf("For %s:\nExpected:\n`%s`\nGot:\n`%s`\n", name, testcontent, content)
 		}
 	}
 
 	for _, name := range badkeys {
-		if _, ok := sqls.Get(name); ok {
+		if _, ok := testdata.Get(name); ok {
 			t.Fatalf("Got OK for unexpected `%s` key.", name)
 		}
+	}
+}
+
+func TestSub(t *testing.T) {
+
+	web := testdata.Sub("web")
+	for name, testcontent := range testyarns {
+		if !strings.HasPrefix(name, "web/") {
+			continue
+		}
+
+		name = strings.TrimPrefix(name, "web/")
+		content, ok := web.Get(name)
+		if !ok {
+			t.Fatalf("Missing %s", name)
+		}
+		if content != testcontent {
+			t.Fatalf("For %s:\nExpected:\n`%s`\nGot:\n`%s`\n", name, testcontent, content)
+		}
+
 	}
 }
