@@ -34,7 +34,7 @@ func TestMustHave(t *testing.T) {
 		if r == nil {
 			t.Fatalf("Didn't panic for bad keys: %s", badkeys)
 		}
-		if r == fmt.Sprintf(missingYarn, badkeys) {
+		if r == fmt.Sprintf(MissingYarn, badkeys) {
 			return
 		}
 		panic(r)
@@ -62,7 +62,7 @@ func TestMust(t *testing.T) {
 			defer func() {
 				r := recover()
 				if r != nil {
-					if r == fmt.Sprintf(missingYarn, name) {
+					if r == fmt.Sprintf(MissingYarn, name) {
 						t.Fatalf("Missing using MUST %s", name)
 						return
 					}
@@ -83,7 +83,7 @@ func TestMust(t *testing.T) {
 				if r == nil {
 					t.Fatalf("Must didn't panic for unexpected `%s` key.", name)
 				}
-				if r != fmt.Sprintf(missingYarn, name) {
+				if r != fmt.Sprintf(MissingYarn, name) {
 					panic(r)
 				}
 			}()

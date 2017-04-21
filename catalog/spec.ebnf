@@ -1,0 +1,30 @@
+// Some pretty basic spec to help writing the parser.
+CATALOG = { Entry };
+
+ENTRY = [ WS ], NameLine, Content, EndLine;
+
+
+NameLine =  NameTagAda | NameTagBashLike | NameTagCLike | NameTagCBlock;
+
+
+NameLineAda      = CommentStartAdaLike,  NameTag, Name, CommentEndNewLine;
+NameLineBashLike = CommentStartBashLike, NameTag, Name, CommentEndNewLine;
+NameLineCLike    = CommentStartCLike,    NameTag, Name, CommentEndNewLine;
+NameLineCBlock   = CommentStartCBlock,   NameTag, Name, CommentEndCBlock;
+
+NameTag = "name", Colon, Space;
+Colon = ":";
+Space = " ";
+
+Name = ".*";
+
+
+CommentStartAdaLike = "--";
+CommentStartBashLike = "##";
+CommentStartCLike = "//";
+CommentStartCBlock = "/*";
+CommentEndCBlock   = "*/";
+CommentEndNewLine   = "\n";
+
+
+Content = { ".*" }
