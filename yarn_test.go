@@ -212,3 +212,44 @@ func TestListSub(t *testing.T) {
 	}
 
 }
+
+func TestWalk(t *testing.T) {
+
+	files := map[string]string{}
+
+	testdata.Walk("**", func(path, content string) {
+		files[path] = content
+	})
+
+	for name, testcontent := range testyarns {
+		content, ok := files[name]
+		if !ok {
+			t.Fatalf("Missing %s", name)
+		}
+		if content != testcontent {
+			t.Fatalf("For %s:\nExpected:\n`%s`\nGot:\n`%s`\n", name, testcontent, content)
+		}
+	}
+
+	for path := range files {
+
+		found := false
+
+		for name := range testyarns {
+			if path == name {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			t.Fatalf("unexpected file %s.", path)
+		}
+
+	}
+
+}
+
+func TestWalkSub(t *testing.T) {
+	// TODO
+}

@@ -120,3 +120,23 @@ func (y *yarn) Sub(path string) Yarn {
 	}
 
 }
+
+// Walk calls the provided function for each file.
+// ** matches any file.
+func (y *yarn) Walk(pattern string, visitor func(path string, content string)) {
+
+	if pattern == "**" {
+		for path, content := range y.yarns {
+			visitor(path, content)
+		}
+		return
+	}
+
+	for path, content := range y.yarns {
+		match, _ := filepath.Match(pattern, path)
+		if match {
+			visitor(path, content)
+		}
+	}
+
+}

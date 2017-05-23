@@ -2,7 +2,6 @@
 package yarn
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -34,6 +33,9 @@ type Yarn interface {
 
 	// List all the files.
 	List() []string
+
+	// Walk calls the provided function with each file.
+	Walk(pattern string, visitor func(path string, content string))
 }
 
 // New creates a new Yarn from provided filesystem's files that match the pattern,
@@ -111,7 +113,6 @@ func addFiles(prefix string, y *yarn, fs http.FileSystem, files []os.FileInfo, p
 				return err
 			}
 			if ok {
-				fmt.Printf("path %v pattern %v\n", path, pattern)
 				break
 			}
 		}
