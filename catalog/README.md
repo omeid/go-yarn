@@ -11,7 +11,7 @@ A Catalog file is a list of content encapsulated in Start and End separator line
 
 Catalog supports and automatically detects four different syntax for separator lines, each of which will constitue a comment line in one or many programming languages, this allows you to use the appropriate filetype and extension and leverage your text editor tooling (linting, syntax highlighting, et al).
 
-The support comment types are lines start with the C-like (`//`), Bash-like (`##`), and Ada-like (`--`) tokens, or a line starting with `/*` and ending with `*/` (C-block style).
+The supported comment types are lines that start with the C-like (`//`), Bash-like (`##`), and Ada-like (`--`) tokens, or a line starting with `/*` and ending with `*/` (C-block style).
 
 The following files are all valid catalogs:
 
@@ -49,7 +49,7 @@ Scripting
 
 
 # More scripting
-echo "Why do you run bash from Go? Double You Tee If?
+echo "Why do you run bash from Go? Double You Tee If?"
 ## end: scriptB
 ```
 
@@ -63,15 +63,17 @@ The simplest way to use this package is with yarn, you simply setup a yarn that 
 
 ```go
 
-sqls, err := catalog.Parse(y yarn.Yarn, "catalog.sql")
+// Assuming the first example is in a file called catalog.sql in the
+// package loaded by the the yarn instance called scripts.
+sqls, err := catalog.Parse(scripts, "catalog.sql")
 // Deal with the error
 
-//Now migrations will have every file from your catalog. Simply load them
+//Now sqls will have every file from your catalog. Simply load them
 err := sqls.Have("select_all_users", "get_all_pages")
 // Deal with the error
 
 // Here you can just use the standard yarn api to get the content of each file in your catalog.
-	res, err := sql.Exec(sqls.Must("select_all_users"))
+res, err := sql.Exec(sqls.Must("select_all_users"))
 // And so forth.
 ```
 

@@ -54,7 +54,7 @@ Make sure you read the  _"Live" development of resources_ section for friction-f
 
 ### Catalog
 
-If you prefer to use a single file with chunks of code (e.g sql statements, lua functions, or so forth), please see the [catalog/README.md] pacakge.
+If you prefer to use a single file with chunks of code (e.g sql statements, lua functions, or so forth), please see the [catalog](catalog/README.md) pacakge.
 
 ### Contributing
 Please consider opening an issue first, or just send a pull request. :)
