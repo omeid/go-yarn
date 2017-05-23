@@ -3,6 +3,7 @@ package yarn
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 )
 
 // MissingYarn error format.
@@ -89,6 +90,21 @@ func (y *yarn) Must(key string) string {
 		panic(fmt.Sprintf(MissingYarn, key))
 	}
 	return content
+}
+
+// List returns all the files.
+func (y *yarn) List() []string {
+
+	files := []string{}
+
+	for path := range y.yarns {
+		// if no prefix or matching path prefix.
+		if y.prefix == "" || strings.HasPrefix(path, y.prefix) {
+			files = append(files, path)
+		}
+	}
+
+	return files
 }
 
 // Sub creats a subview of the yarn only covering the provided

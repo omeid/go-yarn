@@ -29,7 +29,11 @@ type Yarn interface {
 	// Must returns a loaded file's contents as string, it panics if file doesn't exist.
 	Must(key string) string
 
+	// A sub-directory view of the Yarn
 	Sub(dir string) Yarn
+
+	// List all the files.
+	List() []string
 }
 
 // New creates a new Yarn from provided filesystem's files that match the pattern,
