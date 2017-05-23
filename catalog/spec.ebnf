@@ -12,10 +12,10 @@ NameLineBashLike = CommentStartBashLike, NameTag, Name, CommentEndNewLine;
 NameLineCLike    = CommentStartCLike,    NameTag, Name, CommentEndNewLine;
 NameLineCBlock   = CommentStartCBlock,   NameTag, Name, CommentEndCBlock;
 
-NameTag = "name", Colon, Space;
+NameTag = "name", Colon, Space, Name;
+
 Colon = ":";
 Space = " ";
-
 Name = ".*";
 
 
