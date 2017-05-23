@@ -18,19 +18,21 @@ var (
 	// ErrYarnNotFound is returned when the requested file does not
 	// exist in the provided yarn.
 	ErrYarnNotFound = errors.New("Yarn not found")
+
+	// ErrUnexpectedEnd is returned when a catalog is malformed.
+	ErrUnexpectedEnd = errors.New("Unexpected end")
 )
 
 // MustParse is like Parse, but panics if the named string
 // is not found in the provied Yarn or fails to parse
 // the catalog.
 func MustParse(y yarn.Yarn, name string) yarn.Yarn {
-	// files, err := parse(f, Pattern)
-	var err error
+	yarn, err := Parse(y, name)
 	if err != nil {
 		panic(err)
 	}
 
-	return nil
+	return yarn
 }
 
 const nl = "\n"
@@ -170,6 +172,7 @@ func parse(source string) (yarn.Yarn, error) {
 
 	if entryName != "" {
 		// Unexpected end.
+		return nil, ErrUnexpectedEnd
 	}
 
 	return yarn.NewFromMap(files), nil
