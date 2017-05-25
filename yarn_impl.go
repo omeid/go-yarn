@@ -107,6 +107,21 @@ func (y *yarn) List() []string {
 	return files
 }
 
+// All returns every file and content in the yarn.
+func (y *yarn) All() map[string]string {
+
+	files := make(map[string]string, len(y.yarns))
+
+	for path, content := range y.yarns {
+		// if no prefix or matching path prefix.
+		if y.prefix == "" || strings.HasPrefix(path, y.prefix) {
+			files[path] = content
+		}
+	}
+
+	return files
+}
+
 // Sub creats a subview of the yarn only covering the provided
 // directory.
 func (y *yarn) Sub(path string) Yarn {
@@ -122,17 +137,18 @@ func (y *yarn) Sub(path string) Yarn {
 }
 
 // Walk calls the provided function for each file.
-// ** matches any file.
+// Exactly `**` matches any file.
 func (y *yarn) Walk(pattern string, visitor func(path string, content string)) {
 
+	// we use all to take care of subviews.
 	if pattern == "**" {
-		for path, content := range y.yarns {
+		for path, content := range y.All() {
 			visitor(path, content)
 		}
 		return
 	}
 
-	for path, content := range y.yarns {
+	for path, content := range y.All() {
 		match, _ := filepath.Match(pattern, path)
 		if match {
 			visitor(path, content)

@@ -34,6 +34,9 @@ type Yarn interface {
 	// List all the files.
 	List() []string
 
+	// All get every file in the as path -> content
+	All() map[string]string
+
 	// Walk calls the provided function with each file.
 	Walk(pattern string, visitor func(path string, content string))
 }
