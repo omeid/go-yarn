@@ -138,21 +138,28 @@ func (y *yarn) Sub(path string) Yarn {
 
 // Walk calls the provided function for each file.
 // Exactly `**` matches any file.
-func (y *yarn) Walk(pattern string, visitor func(path string, content string)) {
+func (y *yarn) Walk(pattern string, visitor func(path string, content string) error) error {
 
 	// we use all to take care of subviews.
 	if pattern == "**" {
 		for path, content := range y.All() {
-			visitor(path, content)
+			err := visitor(path, content)
+			if err != nil {
+				return err
+			}
 		}
-		return
+		return nil
 	}
 
 	for path, content := range y.All() {
 		match, _ := filepath.Match(pattern, path)
 		if match {
-			visitor(path, content)
+			err := visitor(path, content)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
+	return nil
 }

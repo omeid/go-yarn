@@ -37,8 +37,9 @@ type Yarn interface {
 	// All get every file in the as path -> content
 	All() map[string]string
 
-	// Walk calls the provided function with each file.
-	Walk(pattern string, visitor func(path string, content string))
+	// Walk calls the provided function with each file, it will stop as soon
+	// as an error is returned.
+	Walk(pattern string, visitor func(path string, content string) error) error
 }
 
 // New creates a new Yarn from provided filesystem's files that match the pattern,

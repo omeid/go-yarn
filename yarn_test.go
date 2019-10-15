@@ -1,6 +1,7 @@
 package yarn
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -214,11 +215,11 @@ func TestListSub(t *testing.T) {
 }
 
 func TestWalk(t *testing.T) {
-
 	files := map[string]string{}
 
-	testdata.Walk("**", func(path, content string) {
+	testdata.Walk("**", func(path, content string) error {
 		files[path] = content
+		return nil
 	})
 
 	for name, testcontent := range testyarns {
@@ -247,7 +248,44 @@ func TestWalk(t *testing.T) {
 		}
 
 	}
+}
 
+func TestWalkErrAll(t *testing.T) {
+	files := map[string]string{}
+
+	expect := errors.New("just an error to stop walk")
+	err := testdata.Walk("**", func(path, content string) error {
+		files[path] = content
+		return expect
+	})
+
+	l := len(files)
+	if l != 1 {
+		t.Fatalf("Walk did not stop after first error. Expect 1 got %v", len(files))
+	}
+
+	if expect != err {
+		t.Fatalf("Expected %v got %v", expect, err)
+	}
+}
+
+func TestWalkErr(t *testing.T) {
+	files := map[string]string{}
+
+	expect := errors.New("just an error to stop walk")
+	err := testdata.Walk("*.sql", func(path, content string) error {
+		files[path] = content
+		return expect
+	})
+
+	l := len(files)
+	if l != 1 {
+		t.Fatalf("Walk did not stop after first error. Expect 1 got %v", len(files))
+	}
+
+	if expect != err {
+		t.Fatalf("Expected %v got %v", expect, err)
+	}
 }
 
 func TestWalkSub(t *testing.T) {
