@@ -3,6 +3,7 @@ package catalog
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"regexp"
 	"strings"
 
@@ -14,10 +15,6 @@ var (
 	// a starting line starts with an unsupported comment type.
 	// i.e: it is not `--`, `#`, `//`, or `/*`.
 	ErrUnknownCommentTag = errors.New("Uknown comment pair")
-
-	// ErrYarnNotFound is returned when the requested file does not
-	// exist in the provided yarn.
-	ErrYarnNotFound = errors.New("Yarn not found")
 
 	// ErrUnexpectedEnd is returned when a catalog is malformed.
 	ErrUnexpectedEnd = errors.New("Unexpected end")
@@ -62,9 +59,8 @@ func endTag(start string) (string, error) {
 // Parse the value of catalog from the provided yarn.
 func Parse(y yarn.Yarn, catalog string) (yarn.Yarn, error) {
 	source, ok := y.Get(catalog)
-
 	if !ok {
-		return nil, ErrYarnNotFound
+		return nil, fmt.Errorf(yarn.MissingYarn, catalog)
 	}
 
 	return parse(source)
@@ -73,6 +69,17 @@ func Parse(y yarn.Yarn, catalog string) (yarn.Yarn, error) {
 // ParseString is like Parse, but accept a string as source.
 func ParseString(source string) (yarn.Yarn, error) {
 	return parse(source)
+}
+
+// ParseFile reads the content of the file and parses into a Yarn.
+func ParseFile(filename string) (yarn.Yarn, error) {
+	bs, err := ioutil.ReadFile(filename)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return parse(string(bs))
 }
 
 // Parse loads the value of name from y into a new Yarn.
